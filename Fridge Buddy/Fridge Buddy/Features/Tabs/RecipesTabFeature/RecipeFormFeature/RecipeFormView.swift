@@ -28,7 +28,16 @@ public struct RecipeFormView: View {
           self.name
         }
         Section {
-          ImageSaverView(onSelectImage: { _ in })
+          HStack {
+            ImageSaverView(data: viewStore.binding(\.$recipe.image))
+            if viewStore.state.recipe.image != nil {
+              Button { viewStore.send(.didTapRemoveImage) } label: {
+                Image(systemName: "trash")
+                  .foregroundColor(.red)
+              }
+              .buttonStyle(.plain)
+            }
+          }
         }
         Section("Ingredients") {
           self.ingredients

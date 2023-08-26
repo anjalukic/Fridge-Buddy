@@ -193,7 +193,7 @@ extension RecipeFeature {
           amount: Double(recipe.yieldAmount),
           unit: Unit.portions.id,
           name: recipe.name,
-          imageName: recipe.imageName,
+          imageName: "noImage",
           groceryType: "Dishes"
         ))
         await send(.dependency(.handleRemoveFridgeItemsAndAddToFridge(result)))

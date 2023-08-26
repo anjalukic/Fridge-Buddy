@@ -38,6 +38,7 @@ public struct RecipeFormFeature: ReducerProtocol {
     case didTapRemoveRecipeStep(RecipeStep.ID)
     case didTapAddRecipeItem(GroceryItem, amount: Double, unitId: Unit.ID)
     case didTapAddRecipeStep(description: String, timeInMins: Int?)
+    case didTapRemoveImage
     case delegate(DelegateAction)
     case dependency(DependencyAction)
     
@@ -88,6 +89,10 @@ public struct RecipeFormFeature: ReducerProtocol {
           index: state.recipeSteps.count,
           timerDuration: TimeInterval.createTimeInterval(fromMinutes: timeInMins)
         ))
+        return .none
+        
+      case .didTapRemoveImage:
+        state.recipe.image = nil
         return .none
         
       case .dependency(let dependencyAction):

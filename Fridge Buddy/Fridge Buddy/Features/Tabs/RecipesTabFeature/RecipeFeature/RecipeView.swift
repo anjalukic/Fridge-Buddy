@@ -53,9 +53,9 @@ public struct RecipeView: View {
   }
   
   private var image: some View {
-    WithViewStore(self.store, observe: { $0.recipe.imageName }) { viewStore in
-      if viewStore.state != "noImage" {
-        Image(viewStore.state)
+    WithViewStore(self.store, observe: { $0.recipe.image }) { viewStore in
+      if let image = viewStore.state, let uiImage = UIImage(data: image) {
+        Image(uiImage: uiImage)
           .resizable()
           .aspectRatio(contentMode: .fill)
       }

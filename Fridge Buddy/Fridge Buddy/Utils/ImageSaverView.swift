@@ -9,12 +9,11 @@ import SwiftUI
 import UIKit
 
 struct ImageSaverView: View {
-  @State private var selectedImageData: Data?
+  @Binding private var selectedImageData: Data?
   @State private var isImagePickerPresented = false
-  private var onSelectImage: (Data) -> Void
   
-  public init(onSelectImage: @escaping (Data) -> Void) {
-    self.onSelectImage = onSelectImage
+  public init(data: Binding<Data?>) {
+    self._selectedImageData = data
   }
   
   var body: some View {
@@ -25,23 +24,18 @@ struct ImageSaverView: View {
           .scaledToFit()
           .frame(width: 46, height: 46)
       }
-      Button("Select an image") {
+      Button(self.selectedImageData == nil ? "Select an image" : "Change image") {
         isImagePickerPresented.toggle()
       }
     }
     .sheet(isPresented: $isImagePickerPresented) {
-      ImagePicker(selectedImageData: $selectedImageData) { imageData in
-        // Handle the selected image data here.
-        // You can pass it to a function or save it as needed.
-        print("Received \(imageData.count) bytes of image data.")
-      }
+      ImagePicker(selectedImageData: $selectedImageData)
     }
   }
 }
 
 struct ImagePicker: UIViewControllerRepresentable {
   @Binding var selectedImageData: Data?
-  var completionHandler: ((Data) -> Void)
   
   func makeUIViewController(context: Context) -> UIImagePickerController {
     let imagePicker = UIImagePickerController()
@@ -67,9 +61,6 @@ struct ImagePicker: UIViewControllerRepresentable {
       if let uiImage = info[.originalImage] as? UIImage {
         if let imageData = uiImage.jpegData(compressionQuality: 1.0) {
           parent.selectedImageData = imageData
-          
-          // Call the completion handler with the image data
-          parent.completionHandler(imageData)
         }
       }
       
