@@ -20,14 +20,13 @@ public struct AddItemsView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       VStack(spacing: 36) {
         Button { viewStore.send(.didTapAddSingleItem) } label: {
-          Text("Add a single item")
-            .padding(.vertical, 24)
-            .frame(maxWidth: .infinity)
+          self.styledText("Add a single item")
         }
         Button { viewStore.send(.didTapScanItems) } label: {
-          Text("Scan a receipt QR code")
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 24)
+          self.styledText("Scan a receipt QR code")
+        }
+        Button { viewStore.send(.didTapAddFromShoppingList) } label: {
+          self.styledText("Add items from shopping list")
         }
       }
       .padding(.horizontal, 16)
@@ -44,5 +43,11 @@ public struct AddItemsView: View {
           ReceiptScanView(store: store)
         }
     }
+  }
+  
+  private func styledText(_ text: String) -> some View {
+    Text(text)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, 24)
   }
 }

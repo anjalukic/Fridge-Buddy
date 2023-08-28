@@ -66,10 +66,8 @@
 		DDA8E1C32A1E0D88004F7D9E /* FridgeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1C22A1E0D88004F7D9E /* FridgeItem.swift */; };
 		DDA8E1C52A1E0DE0004F7D9E /* Unit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1C42A1E0DE0004F7D9E /* Unit.swift */; };
 		DDA8E1C72A1E0FB6004F7D9E /* DBClient+GroceryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1C62A1E0FB6004F7D9E /* DBClient+GroceryItem.swift */; };
-		DDA8E1C92A1E101F004F7D9E /* DBClient+GroceryType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1C82A1E101F004F7D9E /* DBClient+GroceryType.swift */; };
 		DDA8E1CC2A1E13B8004F7D9E /* DBClient+FridgeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1CB2A1E13B8004F7D9E /* DBClient+FridgeItem.swift */; };
 		DDA8E1CF2A1E18FC004F7D9E /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1CE2A1E18FC004F7D9E /* ItemView.swift */; };
-		DDA8E1D32A1E4AD5004F7D9E /* DBClient+Unit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1D22A1E4AD5004F7D9E /* DBClient+Unit.swift */; };
 		DDA8E1D82A1F5BE8004F7D9E /* FridgeItemFormFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1D72A1F5BE8004F7D9E /* FridgeItemFormFeature.swift */; };
 		DDA8E1DD2A1F6381004F7D9E /* SearchBarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1DC2A1F6381004F7D9E /* SearchBarListView.swift */; };
 		DDCED3D82A89295C002397C8 /* InteractiveCookingFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCED3D72A89295C002397C8 /* InteractiveCookingFeature.swift */; };
@@ -146,10 +144,8 @@
 		DDA8E1C22A1E0D88004F7D9E /* FridgeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FridgeItem.swift; sourceTree = "<group>"; };
 		DDA8E1C42A1E0DE0004F7D9E /* Unit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unit.swift; sourceTree = "<group>"; };
 		DDA8E1C62A1E0FB6004F7D9E /* DBClient+GroceryItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DBClient+GroceryItem.swift"; sourceTree = "<group>"; };
-		DDA8E1C82A1E101F004F7D9E /* DBClient+GroceryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DBClient+GroceryType.swift"; sourceTree = "<group>"; };
 		DDA8E1CB2A1E13B8004F7D9E /* DBClient+FridgeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DBClient+FridgeItem.swift"; sourceTree = "<group>"; };
 		DDA8E1CE2A1E18FC004F7D9E /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
-		DDA8E1D22A1E4AD5004F7D9E /* DBClient+Unit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DBClient+Unit.swift"; sourceTree = "<group>"; };
 		DDA8E1D72A1F5BE8004F7D9E /* FridgeItemFormFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FridgeItemFormFeature.swift; sourceTree = "<group>"; };
 		DDA8E1DC2A1F6381004F7D9E /* SearchBarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarListView.swift; sourceTree = "<group>"; };
 		DDCED3D72A89295C002397C8 /* InteractiveCookingFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveCookingFeature.swift; sourceTree = "<group>"; };
@@ -393,10 +389,8 @@
 		DDA8E1CA2A1E138B004F7D9E /* DBClient+Tables */ = {
 			isa = PBXGroup;
 			children = (
-				DDA8E1C82A1E101F004F7D9E /* DBClient+GroceryType.swift */,
 				DDA8E1C62A1E0FB6004F7D9E /* DBClient+GroceryItem.swift */,
 				DDA8E1CB2A1E13B8004F7D9E /* DBClient+FridgeItem.swift */,
-				DDA8E1D22A1E4AD5004F7D9E /* DBClient+Unit.swift */,
 				DD4BC0802A88E1A000C33C4E /* DBClient+Recipe.swift */,
 				DD4BC0822A88E32800C33C4E /* DBClient+RecipeItem.swift */,
 				DD4BC0842A88E66200C33C4E /* DBClient+RecipeStep.swift */,
@@ -587,7 +581,6 @@
 				DDA8E1C12A1DF9A5004F7D9E /* GroceryType.swift in Sources */,
 				DD560B7A2A8E8482009FA067 /* RecipesListView.swift in Sources */,
 				DD99F5542A979C2000F6CBE5 /* AddItemsView.swift in Sources */,
-				DDA8E1D32A1E4AD5004F7D9E /* DBClient+Unit.swift in Sources */,
 				DDCED3E82A8BCE77002397C8 /* DBClient+ShoppingListItem.swift in Sources */,
 				DD4BC0722A85441200C33C4E /* FridgeItemFormView.swift in Sources */,
 				DD99F53C2A9531EF00F6CBE5 /* Semaphore.swift in Sources */,
@@ -621,7 +614,6 @@
 				DDA8E1D82A1F5BE8004F7D9E /* FridgeItemFormFeature.swift in Sources */,
 				DDA8E1CC2A1E13B8004F7D9E /* DBClient+FridgeItem.swift in Sources */,
 				DD560B882A920C07009FA067 /* LoginFeature.swift in Sources */,
-				DDA8E1C92A1E101F004F7D9E /* DBClient+GroceryType.swift in Sources */,
 				DD560B932A92297B009FA067 /* ShareFridgeFeature.swift in Sources */,
 				DD560B8E2A921496009FA067 /* Dependencies+UserInfoClient.swift in Sources */,
 				DD99F55F2A992C6100F6CBE5 /* ImageSaverView.swift in Sources */,

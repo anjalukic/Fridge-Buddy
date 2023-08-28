@@ -21,6 +21,7 @@ public struct MealPlannerTabFeature: ReducerProtocol {
   
   public enum Action: Equatable {
     case onAppear
+    case handleCheckTodaysPlans
     case didChangeSelectedDate(Date)
     case didTapAddNewMeal(PlannedMeal.Meal)
     case didTapChangeMeal(PlannedMeal.Meal)
@@ -28,6 +29,7 @@ public struct MealPlannerTabFeature: ReducerProtocol {
     case recipesList(PresentationAction<RecipesListFeature.Action>)
     case alert(AlertAction)
     case dependency(DependencyAction)
+    case delegate(DelegateAction)
     
     public enum AlertAction: Equatable {
       case didTapConfirmDeletion
@@ -43,6 +45,11 @@ public struct MealPlannerTabFeature: ReducerProtocol {
       case handleDeletionResult(Result<Bool, DBClient.DBError>)
       case handleEditingResult(Result<Bool, DBClient.DBError>)
       case handleAddingResult(Result<Bool, DBClient.DBError>)
+      case handleTodaysMealsFetched(Result<String, DBClient.DBError>)
+    }
+    
+    public enum DelegateAction: Equatable {
+      case presentPlannedMealAlert(message: String)
     }
   }
   
@@ -53,6 +60,49 @@ public struct MealPlannerTabFeature: ReducerProtocol {
       switch action {
       case .onAppear:
         return self.fetchItems()
+        
+      case .handleCheckTodaysPlans:
+        return .run { send in
+          let mealsResult = await self.dbClient.readPlannedMeal()
+          let recipeItemsResult = await self.dbClient.readRecipeItem()
+          let fridgeItemsResult = await self.dbClient.readFridgeItem()
+          guard
+            case .success(let meals) = mealsResult,
+            case .success(let recipeItems) = recipeItemsResult,
+            case .success(var fridgeItems) = fridgeItemsResult
+          else {
+            await send(.dependency(.handleTodaysMealsFetched(.failure(.readingError))))
+            return
+          }
+          let todaysMeals = meals.filter { $0.date.isSameDate(as: Date()) }
+          let todaysRecipeIds = todaysMeals.map { $0.recipeId }
+          var startingFridgeItems = fridgeItems
+          var missingItems: IdentifiedArrayOf<RecipeItem> = []
+          todaysRecipeIds.forEach { recipeId in
+            let (missing, updatedFridgeItems) = RecipeFeature.State.findMissingItems(
+              recipeItems: recipeItems.filter { $0.recipeId == recipeId },
+              fridgeItems: startingFridgeItems
+            )
+            missingItems.append(contentsOf: missing)
+            updatedFridgeItems.filter { $0.amount == 0 }.map { $0.id }.forEach {
+              startingFridgeItems.remove(id: $0)
+            }
+            updatedFridgeItems.filter { $0.amount != 0 }.forEach {
+              startingFridgeItems[id: $0.id]?.amount = $0.amount
+              startingFridgeItems[id: $0.id]?.unit = $0.unit
+            }
+          }
+          
+          let message: String
+          if missingItems.isEmpty {
+            let todaysMenu = todaysMeals.map { "\($0.name) for \($0.mealType.title.lowercased())" }.joined(separator: "\n")
+            message = "Today's menu:\n\(todaysMenu)"
+          } else {
+            let missingList = missingItems.map { "\($0.name) \($0.amount)\($0.unit)" }.joined(separator: "\n")
+            message = "You are missing the following ingredients for today's menu:\n\(missingList)"
+          }
+          await send(.dependency(.handleTodaysMealsFetched(.success(message))))
+        }
         
       case .didChangeSelectedDate(let date):
         state.selectedDate = date
@@ -81,6 +131,10 @@ public struct MealPlannerTabFeature: ReducerProtocol {
         
       case .dependency(let action):
         return self.handleDependencyAction(action, state: &state)
+        
+      case .delegate:
+        // handled in the higher level reducer
+        return .none
       }
     }
     .ifLet(\.$recipesList, action: /Action.recipesList) {
@@ -183,6 +237,14 @@ extension MealPlannerTabFeature {
       case .failure:
         return .none
       }
+      
+    case .handleTodaysMealsFetched(let result):
+      switch result {
+      case .success(let message):
+        return .send(.delegate(.presentPlannedMealAlert(message: message)))
+      case .failure:
+        return .none
+      }
     }
   }
   
@@ -216,6 +278,14 @@ extension MealPlannerTabFeature.State {
 extension Date {
   func isSameDate(as date: Date) -> Bool {
     return Calendar.current.isDate(self, equalTo: date, toGranularity: .day)
+  }
+  
+  var hasPassed: Bool {
+    let today = Date()
+    if self.isSameDate(as: today) {
+      return false
+    }
+    return self < today
   }
   
   func formattedDate() -> String {

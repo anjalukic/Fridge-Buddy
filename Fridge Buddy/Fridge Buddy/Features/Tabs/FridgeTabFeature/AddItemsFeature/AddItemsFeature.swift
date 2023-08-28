@@ -17,16 +17,26 @@ public struct AddItemsFeature: ReducerProtocol {
   public enum Action: Equatable {
     case didTapScanItems
     case didTapAddSingleItem
+    case didTapAddFromShoppingList
     case addItem(PresentationAction<FridgeItemFormFeature.Action>)
     case scanItems(PresentationAction<ReceiptScanFeature.Action>)
     case delegate(DelegateAction)
+    case dependency(DependencyAction)
     
     public enum DelegateAction: Equatable {
       case handleAddItems([FridgeItem])
     }
+    
+    public enum DependencyAction: Equatable {
+      case handleShoppingItemsFetched(
+        Result<IdentifiedArrayOf<ShoppingListItem>, DBClient.DBError>,
+        Result<IdentifiedArrayOf<GroceryItem>, DBClient.DBError>
+      )
+    }
   }
   
   @Dependency(\.dismiss) var dismiss
+  @Dependency(\.databaseClient) var dbClient
   
   public var body: some ReducerProtocolOf<Self> {
     Reduce { state, action in
@@ -47,6 +57,13 @@ public struct AddItemsFeature: ReducerProtocol {
           mode: .addingNewItem
         )
         return .none
+        
+      case .didTapAddFromShoppingList:
+        return .run { send in
+          let shoppingResult = await self.dbClient.readShoppingListItem()
+          let groceryResult = await self.dbClient.readGroceryItem()
+          await send(.dependency(.handleShoppingItemsFetched(shoppingResult, groceryResult)))
+        }
       
       case .addItem(let action):
         guard case .presented(let addAction) = action else { return .none }
@@ -55,6 +72,9 @@ public struct AddItemsFeature: ReducerProtocol {
       case .scanItems(let action):
         guard case .presented(let scanAction) = action else { return .none }
         return self.handleScanItemsAction(scanAction, state: &state)
+        
+      case .dependency(let action):
+        return self.handleDependencyAction(action, state: &state)
         
       case .delegate:
         // handled in the higher level reducer
@@ -101,4 +121,33 @@ extension AddItemsFeature {
       return .none
     }
   }
+  
+  private func handleDependencyAction(_ action: Action.DependencyAction, state: inout State) -> EffectTask<Action> {
+    switch action {
+    case .handleShoppingItemsFetched(let shoppingResult, let groceryResult):
+      switch (shoppingResult, groceryResult) {
+      case (.success(let shoppingItems), .success(let groceryItems)):
+        let fridgeItems: [FridgeItem] = shoppingItems.map { item in
+          guard let grocery = groceryItems[id: item.groceryItemId] else { return nil }
+          return FridgeItem.init(
+            id: .init(),
+            groceryItemId: item.groceryItemId,
+            expirationDate: Date() + grocery.defaultExpirationInterval,
+            amount: item.amount,
+            unit: item.unit,
+            name: item.name,
+            imageName: grocery.imageName,
+            groceryType: grocery.type
+          )
+        }.compactMap { $0 }
+        return .merge(
+          .send(.delegate(.handleAddItems(fridgeItems))),
+          .run { _ in await self.dismiss(animation: .default) }
+        )
+      default:
+        return .none
+      }
+    }
+  }
+
 }

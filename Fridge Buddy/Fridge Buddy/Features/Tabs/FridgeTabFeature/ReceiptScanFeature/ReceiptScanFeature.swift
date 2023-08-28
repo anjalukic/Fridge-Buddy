@@ -34,7 +34,7 @@ public struct ReceiptScanFeature: ReducerProtocol {
     
     public enum DependencyAction: Equatable {
       case handleItemsFetched(Result<IdentifiedArrayOf<GroceryItem>, DBClient.DBError>)
-      case handleParsingFridgeItems(IdentifiedArrayOf<FridgeItem>)
+      case handleParsedFridgeItems(IdentifiedArrayOf<FridgeItem>)
     }
   }
   
@@ -52,9 +52,9 @@ public struct ReceiptScanFeature: ReducerProtocol {
         
       case .handleScanDone(let items):
         state.isScanningComplete = true
-        return .run { send in
-          let items = Self.parseFridgeItems(scannedItems: items)
-          await send(.dependency(.handleParsingFridgeItems(.init(uniqueElements: items))))
+        return .run { [groceryItems = state.groceryItems] send in
+          let items = Self.parseFridgeItems(scannedItems: items, groceryItems: groceryItems)
+          await send(.dependency(.handleParsedFridgeItems(.init(uniqueElements: items))))
         }
         
       case .didTapRemoveItem(let id):
@@ -110,7 +110,7 @@ public struct ReceiptScanFeature: ReducerProtocol {
           return .none
         }
         
-      case .dependency(.handleParsingFridgeItems(let items)):
+      case .dependency(.handleParsedFridgeItems(let items)):
         state.fridgeItems = items
         return .none
         
@@ -125,10 +125,9 @@ public struct ReceiptScanFeature: ReducerProtocol {
 extension ReceiptScanFeature {
   private static let threshold: Float = 0.2
   
-  fileprivate static func parseFridgeItems(scannedItems: [ScannedItem]) -> [FridgeItem] {
+  fileprivate static func parseFridgeItems(scannedItems: [ScannedItem], groceryItems: IdentifiedArrayOf<GroceryItem>) -> [FridgeItem] {
     guard
-      let groceryItemsSr = JSONImporter.groceryItemsSr,
-      let groceryItems = JSONImporter.groceryItems
+      let groceryItemsSr = JSONImporter.groceryItemsSr
     else { return [] }
     let groceryKeys = Array(groceryItemsSr.keys)
     
@@ -137,23 +136,20 @@ extension ReceiptScanFeature {
       let match = Self.findBestMatch(groceryKeys, scannedItem: scannedItemName)
       guard
         let match,
-        let id = groceryItemsSr[match],
-        let item = groceryItems[id],
-        let interval = item["defaultExpInterval"] as? Int,
-        let name = item["name"] as? String,
-        let imageName = item["imageName"] as? String,
-        let groceryType = item["type"] as? String
+        let idString = groceryItemsSr[match],
+        let id = UUID(uuidString: idString),
+        let item = groceryItems[id: id]
       else { return nil }
       
       return FridgeItem(
         id: .init(),
-        groceryItemId: UUID(uuidString: id)!,
-        expirationDate: Date() + TimeInterval(interval),
+        groceryItemId: id,
+        expirationDate: Date() + TimeInterval(item.defaultExpirationInterval),
         amount: round(Double(scannedItem.amount) * 100) / 100,
         unit: Unit.kg.id,
-        name: name,
-        imageName: imageName,
-        groceryType: groceryType
+        name: item.name,
+        imageName: item.imageName,
+        groceryType: item.type
       )
     }
     .compactMap { $0 }

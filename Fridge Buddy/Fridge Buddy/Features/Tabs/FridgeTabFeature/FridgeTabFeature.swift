@@ -12,7 +12,6 @@ public struct FridgeTabFeature: ReducerProtocol {
   public struct State: Equatable {
     var isEditing: Bool = false
     var items: IdentifiedArrayOf<FridgeItem> = []
-    var groceryItems: IdentifiedArrayOf<GroceryItem> = []
     var sectionedItems: [String: IdentifiedArrayOf<FridgeItem>] = [:]
     var alert: Alert?
     
@@ -40,10 +39,7 @@ public struct FridgeTabFeature: ReducerProtocol {
     }
     
     public enum DependencyAction: Equatable {
-      case handleItemsFetched(
-        Result<IdentifiedArrayOf<FridgeItem>, DBClient.DBError>,
-        Result<IdentifiedArrayOf<GroceryItem>, DBClient.DBError>
-      )
+      case handleItemsFetched(Result<IdentifiedArrayOf<FridgeItem>, DBClient.DBError>)
       case handleDeletionResult(Result<Bool, DBClient.DBError>)
     }
   }
@@ -150,14 +146,13 @@ extension FridgeTabFeature {
   
   private func handleDependencyAction(_ action: Action.DependencyAction, state: inout State) -> EffectTask<Action> {
     switch action {
-    case .handleItemsFetched(let fridgeItemResult, let groceryItemResult):
-      switch (fridgeItemResult, groceryItemResult) {
-      case (.success(let fridgeItems), .success(let groceryItems)):
+    case .handleItemsFetched(let fridgeItemResult):
+      switch fridgeItemResult {
+      case .success(let fridgeItems):
         state.items = fridgeItems
-        state.groceryItems = groceryItems
         state.sectionedItems = state.getSectionedItems()
         return .none
-      default:
+      case .failure:
         return .none
       }
       
@@ -174,8 +169,7 @@ extension FridgeTabFeature {
   private func fetchItems() -> EffectTask<Action> {
     return .task {
       let fridgeItems = await self.dbClient.readFridgeItem()
-      let groceryItems = await self.dbClient.readGroceryItem()
-      return .dependency(.handleItemsFetched(fridgeItems, groceryItems))
+      return .dependency(.handleItemsFetched(fridgeItems))
     }
   }
 }

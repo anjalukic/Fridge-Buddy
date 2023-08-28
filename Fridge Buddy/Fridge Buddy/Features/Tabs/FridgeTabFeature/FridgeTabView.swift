@@ -52,7 +52,13 @@ public struct FridgeTabView: View {
                   Button(action: {
                     viewStore.send(.didTapItem(item.id))
                   }, label: {
-                    ItemView(name: item.name, amount: item.amount, unitName: item.unit)
+                    HStack {
+                      ItemView(name: item.name, amount: item.amount, unitName: item.unit)
+                      if item.expirationDate.hasPassed {
+                        Image(systemName: "calendar.badge.exclamationmark")
+                          .foregroundColor(.orange)
+                      }
+                    }
                   })
                   Spacer()
                   if viewStore.isEditing {

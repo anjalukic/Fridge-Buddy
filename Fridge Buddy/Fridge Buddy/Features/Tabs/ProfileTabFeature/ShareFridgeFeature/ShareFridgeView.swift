@@ -17,15 +17,23 @@ public struct ShareFridgeView: View {
   
   public var body: some View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
-      VStack {
-        TitleWithBackButtonView(title: "Connect your fridge", didTapBack: { viewStore.send(.didTapBack) })
-        Group {
-          self.emailField
-          Spacer()
-          self.description
-          self.continueButton
+      ZStack {
+        VStack {
+          TitleWithBackButtonView(title: "Connect your fridge", didTapBack: { viewStore.send(.didTapBack) })
+          Group {
+            self.emailField
+            Spacer()
+            self.description
+            self.continueButton
+          }
+          .padding(.horizontal, 16)
         }
-        .padding(.horizontal, 16)
+        .disabled(viewStore.isSharingInProgress)
+        if viewStore.isSharingInProgress {
+          ProgressView("Loading")
+            .frame(width: 200, height: 200)
+            .cornerRadius(12)
+        }
       }
       .alert(self.store.scope(state: \.alert?.alertState, action: { .alert($0) }), dismiss: .didDismiss)
     }

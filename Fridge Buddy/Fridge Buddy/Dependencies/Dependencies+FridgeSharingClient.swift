@@ -12,7 +12,7 @@ import ComposableArchitecture
 enum FridgeSharingClientKey: DependencyKey {
   static let defaultValue: FridgeSharingClient = .init(
     createConnection: { email in .success(UUID()) },
-    getConnection: { .success(UUID()) },
+    getConnection: { .success(.connected(id: .init())) },
     removeConnection: { .success(true) },
     getConnectedEmails: { .success([]) },
     uploadFridge: { .success(true) },
@@ -63,12 +63,14 @@ enum FridgeSharingClientKey: DependencyKey {
     getConnection: {
       guard let userEmail = Self.getUserEmail() else { return .failure(.notLoggedInError) }
       
-      // check if there's a locally saved connection
+      // check if the connection is already saved locally
       let defaults = UserDefaults.standard
-      if
-        let connectionIdString = defaults.string(forKey: "connection"),
-        let connectionId = UUID(uuidString: connectionIdString)
-      { return .success(connectionId) }
+      let localConnectionId: UUID?
+      if let connectionIdString = defaults.string(forKey: "connection") {
+        localConnectionId = UUID(uuidString: connectionIdString)
+      } else {
+        localConnectionId = nil
+      }
       
       // read the connections from the server
       let result = await ServerRequest.get(url: Self.getSharedFridgesURL)
@@ -78,14 +80,23 @@ enum FridgeSharingClientKey: DependencyKey {
         var connections = fridgesInfo["connections"] as? [String: String]
       else { return .failure(.readingError) }
       
-      guard let connectionId = connections[userEmail] else { return .success(nil) }
+      guard let connectionId = connections[userEmail] else {
+        if localConnectionId != nil {
+          return .failure(.localConnectionInInconsistentState)
+        }
+        return .success(.noConnection)
+      }
+      
       guard let id = UUID(uuidString: connectionId) else { return .failure(.readingError) }
       
-      // save the connection locally
-      defaults.set(connectionId, forKey: "connection")
-      defaults.removeObject(forKey: "dbLastUpdated")
-      
-      return .success(id)
+      if localConnectionId != nil {
+        return .success(.connected(id: id))
+      } else {
+        defaults.set(connectionId, forKey: "connection")
+        defaults.removeObject(forKey: "dbLastUpdated")
+        let emails = connections.filter { (email, connId) in connId == connectionId && email != userEmail }.keys.map { $0 }
+        return .success(.newConnection(id: id, emails: emails))
+      }
     },
     
     removeConnection: {
@@ -109,7 +120,7 @@ enum FridgeSharingClientKey: DependencyKey {
       }
       
       // save the new value on server
-      connections = connections.filter { (email, id) in id != connectionIdString }
+      connections[userEmail] = nil
       fridgesInfo["connections"] = connections
       let postResult = await ServerRequest.post(json: fridgesInfo, url: Self.postSharedFridgesURL)
       guard case .success = postResult else { return .failure(.postingError) }
@@ -380,6 +391,7 @@ extension FridgeSharingClient {
     case notLoggedInError
     case userAlreadyHasConnection
     case noConnectionError
+    case localConnectionInInconsistentState
   }
 }
 

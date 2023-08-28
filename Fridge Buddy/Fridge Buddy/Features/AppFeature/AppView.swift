@@ -16,7 +16,7 @@ struct AppView: View {
   }
   
   var body: some View {
-    WithViewStore(self.store) { viewStore in
+    WithViewStore(self.store, observe: { $0 }) { viewStore in
       SwiftUI.TabView(
         selection: viewStore.binding(
           get: { $0.selectedTab },
@@ -95,6 +95,27 @@ struct AppView: View {
         UITabBar.appearance().scrollEdgeAppearance = appearance
         viewStore.send(.onAppear)
       }
+      .alert(self.store.scope(state: \.alert?.alertState, action: { .alert($0) }), dismiss: .didDismiss)
+    }
+  }
+}
+
+extension AppFeature.State.Alert {
+  fileprivate var alertState: AlertState<AppFeature.Action.AlertAction> {
+    switch self {
+    case .newConnectionReceived(emails: let emails):
+      return .init(
+        title: .init("New connection received!"),
+        message: .init("The following emails want to connect their fridges with you: \n\(emails.joined(separator: "\n"))"),
+        primaryButton: .default(.init("Accept"), action: .send(.didDismiss)),
+        secondaryButton: .default(.init("Decline"), action: .send(.didDeclineConnection))
+      )
+    case .todaysMenu(message: let message):
+      return .init(
+        title: .init("Meal planner"),
+        message: .init(message),
+        dismissButton: .default(.init("OK"), action: .send(.didDismiss))
+      )
     }
   }
 }

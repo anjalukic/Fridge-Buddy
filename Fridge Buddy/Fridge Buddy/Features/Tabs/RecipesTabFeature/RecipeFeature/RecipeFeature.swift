@@ -133,37 +133,9 @@ extension RecipeFeature {
       }
       recipeItems = recipeItems.filter { $0.recipeId == id }
       recipeSteps = recipeSteps.filter { $0.recipeId == id }
-      var missingRecipeItems: IdentifiedArrayOf<RecipeItem> = []
-      var removedOrUpdatedFridgeItems: IdentifiedArrayOf<FridgeItem> = []
       
-      for item in recipeItems {
-        var amount = item.amount
-        var unit = item.unit
-        for fridgeItem in fridgeItems.filter({ $0.groceryItemId == item.groceryItemId }) {
-          let itemAmount = AmountWithUnit(amount: amount, unit: unit)
-          guard Unit(name: fridgeItem.unit).isComparable(with: itemAmount.unit) else { continue }
-          let fridgeAmount = AmountWithUnit(amount: fridgeItem.amount, unit: fridgeItem.unit)
-          // calculate missing amount
-          amount = max(itemAmount.amount - fridgeAmount.amount, 0)
-          unit = fridgeAmount.unit
-          // calculate used amount
-          var usedFridgeItem = fridgeItem
-          usedFridgeItem.amount = max(fridgeAmount.amount - itemAmount.amount, 0)
-          usedFridgeItem.unit = fridgeAmount.unit
-          removedOrUpdatedFridgeItems.append(usedFridgeItem)
-        }
-        
-        if amount > 0 {
-          missingRecipeItems.append(.init(
-            id: .init(),
-            recipeId: item.recipeId,
-            groceryItemId: item.groceryItemId,
-            amount: amount,
-            unit: unit,
-            name: item.name
-          ))
-        }
-      }
+      let (missingRecipeItems, removedOrUpdatedFridgeItems) = State.findMissingItems(recipeItems: recipeItems, fridgeItems: fridgeItems)
+      
       return .dependency(.handleItemsFetched(.success(recipeItems), .success(recipeSteps), .success(missingRecipeItems), .success(removedOrUpdatedFridgeItems)))
     }
   }
@@ -260,5 +232,46 @@ extension RecipeFeature.State {
   public enum Alert: Equatable {
     case missingIngredientsAddedToList(String)
     case confirmAddingMealToFridge
+  }
+}
+
+extension RecipeFeature.State {
+  public static func findMissingItems(
+    recipeItems: IdentifiedArrayOf<RecipeItem>,
+    fridgeItems: IdentifiedArrayOf<FridgeItem>
+  ) -> (IdentifiedArrayOf<RecipeItem>, IdentifiedArrayOf<FridgeItem>) {
+    var missingRecipeItems: IdentifiedArrayOf<RecipeItem> = []
+    var removedOrUpdatedFridgeItems: IdentifiedArrayOf<FridgeItem> = []
+    
+    for item in recipeItems {
+      var amount = item.amount
+      var unit = item.unit
+      for fridgeItem in fridgeItems.filter({ $0.groceryItemId == item.groceryItemId }) {
+        let itemAmount = AmountWithUnit(amount: amount, unit: unit)
+        guard Unit(name: fridgeItem.unit).isComparable(with: itemAmount.unit) else { continue }
+        let fridgeAmount = AmountWithUnit(amount: fridgeItem.amount, unit: fridgeItem.unit)
+        // calculate missing amount
+        amount = max(itemAmount.amount - fridgeAmount.amount, 0)
+        unit = fridgeAmount.unit
+        // calculate used amount
+        var usedFridgeItem = fridgeItem
+        usedFridgeItem.amount = max(fridgeAmount.amount - itemAmount.amount, 0)
+        usedFridgeItem.unit = fridgeAmount.unit
+        removedOrUpdatedFridgeItems.append(usedFridgeItem)
+      }
+      
+      if amount > 0 {
+        missingRecipeItems.append(.init(
+          id: .init(),
+          recipeId: item.recipeId,
+          groceryItemId: item.groceryItemId,
+          amount: amount,
+          unit: unit,
+          name: item.name
+        ))
+      }
+    }
+    
+    return (missingRecipeItems, removedOrUpdatedFridgeItems)
   }
 }

@@ -19,7 +19,6 @@ enum DatabaseClientKey: DependencyKey {
     deleteAllShoppingListItemsFor: { _ in .success(true) },
     deletePlannedMeal: { _ in .success(true) },
     readFridgeItem: { return .success([]) },
-//    readGroceryType: { return .success([]) },
     readGroceryItem: { return .success([]) },
     readRecipe: { return .success([]) },
     readRecipeItem: { return .success([]) },
@@ -44,76 +43,90 @@ enum DatabaseClientKey: DependencyKey {
   static var liveValue: DatabaseClient = {
     let uploadActor = Semaphore()
     let dbClient = DBClient()
+    let dbActor = Semaphore()
     
     @Sendable
     func uploadChangesIfConnected() async {
       await uploadActor.withSemaphoreLock {
         let connectionResult = await FridgeSharingClientKey.liveValue.getConnection()
-        guard case .success(let id) = connectionResult, id != nil else { return }
+        guard
+          case .success(let status) = connectionResult,
+          case .connected(id: let id) = status
+        else { return }
         let _ = await FridgeSharingClientKey.liveValue.uploadFridge()
       }
     }
     
-    func readItems<E>(_ readAction: (Bool) throws -> [E]) -> Result<IdentifiedArrayOf<E>, DBClient.DBError> {
-      do {
-        let items = try readAction(false)
-        return .success(.init(uniqueElements: items))
-      } catch let error as DBClient.DBError {
-        return .failure(error)
-      } catch {
-        return .failure(.readingError)
+    func readItems<E>(_ readAction: (Bool) throws -> [E]) async -> Result<IdentifiedArrayOf<E>, DBClient.DBError> {
+      await dbActor.withSemaphoreLock {
+        do {
+          let items = try readAction(false)
+          return .success(.init(uniqueElements: items))
+        } catch let error as DBClient.DBError {
+          return .failure(error)
+        } catch {
+          return .failure(.readingError)
+        }
       }
     }
     func deleteItem(_ deleteAction: (UUID) throws -> Void, id: UUID) async -> Result<Bool, DBClient.DBError> {
-      do {
-        try deleteAction(id)
-        Task {
-          await uploadChangesIfConnected()
+      await dbActor.withSemaphoreLock {
+        do {
+          try deleteAction(id)
+          Task {
+            await uploadChangesIfConnected()
+          }
+          return .success(true)
+        } catch let error as DBClient.DBError {
+          return .failure(error)
+        } catch {
+          return .failure(.deletionError)
         }
-        return .success(true)
-      } catch let error as DBClient.DBError {
-        return .failure(error)
-      } catch {
-        return .failure(.deletionError)
       }
     }
     func deleteAllItems(_ deleteAction: () throws -> Void) async -> Result<Bool, DBClient.DBError> {
-      do {
-        try deleteAction()
-        Task {
-          await uploadChangesIfConnected()
+      await dbActor.withSemaphoreLock {
+        do {
+          try deleteAction()
+          Task {
+            await uploadChangesIfConnected()
+          }
+          return .success(true)
+        } catch let error as DBClient.DBError {
+          return .failure(error)
+        } catch {
+          return .failure(.deletionError)
         }
-        return .success(true)
-      } catch let error as DBClient.DBError {
-        return .failure(error)
-      } catch {
-        return .failure(.deletionError)
       }
     }
     func updateItem<E>(_ updateAction: (E) throws -> Void, item: E) async -> Result<Bool, DBClient.DBError> {
-      do {
-        try updateAction(item)
-        Task {
-          await uploadChangesIfConnected()
+      await dbActor.withSemaphoreLock {
+        do {
+          try updateAction(item)
+          Task {
+            await uploadChangesIfConnected()
+          }
+          return .success(true)
+        } catch let error as DBClient.DBError {
+          return .failure(error)
+        } catch {
+          return .failure(.updatingError)
         }
-        return .success(true)
-      } catch let error as DBClient.DBError {
-        return .failure(error)
-      } catch {
-        return .failure(.updatingError)
       }
     }
     func insertItem<E>(_ insertAction: (E) throws -> Void, item: E) async -> Result<Bool, DBClient.DBError> {
-      do {
-        try insertAction(item)
-        Task {
-          await uploadChangesIfConnected()
+      await dbActor.withSemaphoreLock {
+        do {
+          try insertAction(item)
+          Task {
+            await uploadChangesIfConnected()
+          }
+          return .success(true)
+        } catch let error as DBClient.DBError {
+          return .failure(error)
+        } catch {
+          return .failure(.insertionError)
         }
-        return .success(true)
-      } catch let error as DBClient.DBError {
-        return .failure(error)
-      } catch {
-        return .failure(.insertionError)
       }
     }
     
@@ -143,28 +156,25 @@ enum DatabaseClientKey: DependencyKey {
         return await deleteItem(dbClient.deletePlannedMeal(id:), id: id)
       },
       readFridgeItem: {
-        readItems(dbClient.readFridgeItem)
+        return await readItems(dbClient.readFridgeItem)
       },
-//      readGroceryType: {
-//        readItems( dbClient.readGroceryType)
-//      },
       readGroceryItem: {
-        readItems(dbClient.readGroceryItem)
+        return await readItems(dbClient.readGroceryItem)
       },
       readRecipe: {
-        readItems(dbClient.readRecipe)
+        return await readItems(dbClient.readRecipe)
       },
       readRecipeItem: {
-        readItems(dbClient.readRecipeItem)
+        return await readItems(dbClient.readRecipeItem)
       },
       readRecipeStep: {
-        readItems(dbClient.readRecipeStep)
+        return await readItems(dbClient.readRecipeStep)
       },
       readShoppingListItem: {
-        readItems(dbClient.readShoppingListItem)
+        return await readItems(dbClient.readShoppingListItem)
       },
       readPlannedMeal: {
-        readItems(dbClient.readPlannedMeal)
+        return await readItems(dbClient.readPlannedMeal)
       },
       updateFridgeItem: { item in
         return await updateItem(dbClient.updateFridgeItem, item: item)
