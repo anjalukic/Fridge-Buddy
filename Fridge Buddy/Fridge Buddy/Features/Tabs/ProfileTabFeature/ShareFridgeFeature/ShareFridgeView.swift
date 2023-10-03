@@ -47,7 +47,7 @@ public struct ShareFridgeView: View {
           .textInputAutocapitalization(.never)
           .autocorrectionDisabled(true)
       }
-      .padding(.vertical, 16)
+      .padding(16)
     }
   }
   
@@ -62,11 +62,12 @@ public struct ShareFridgeView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       Button { viewStore.send(.didTapContinue) } label: {
         Text("Continue")
-          .fontWeight(.bold)
+          .padding(.vertical, 8)
           .frame(maxWidth: .infinity)
       }
       .disabled(!viewStore.isContinueEnabled)
       .buttonStyle(.borderedProminent)
+      .accentColor(Color.init("AppetiteRed"))
     }
   }
 }

@@ -49,6 +49,7 @@ public struct ShoppingListTabView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       VStack {
         SearchBar(text: $searchText)
+          .padding(.vertical, 6)
         List {
           ForEach(viewStore.state.items.filter({ searchText.isEmpty ? true : $0.name.contains(searchText) })) { item in
             HStack {
@@ -82,6 +83,7 @@ public struct ShoppingListTabView: View {
         Image(systemName: "plus")
       }
       .opacity(viewStore.isEditing ? 0 : 1)
+      .foregroundColor(.white)
     }
   }
 
@@ -97,6 +99,7 @@ public struct ShoppingListTabView: View {
         }
       }
     }
+    .foregroundColor(.white)
   }
   
   private var removeAllItemsButton: some View {
@@ -104,9 +107,8 @@ public struct ShoppingListTabView: View {
       if !viewStore.isEditing && !viewStore.items.isEmpty {
         Button(action: { viewStore.send(.didTapRemoveAllItems) }) {
           Text("Clear the list")
-            .bold()
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
         }
         .buttonStyle(.borderedProminent)
         .accentColor(.green)

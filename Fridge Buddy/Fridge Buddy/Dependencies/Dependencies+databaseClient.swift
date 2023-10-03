@@ -29,6 +29,7 @@ enum DatabaseClientKey: DependencyKey {
     updateRecipe: { _ in return .success(true) },
     updateShoppingListItem: { _ in return .success(true) },
     insertFridgeItem: { _ in return .success(true) },
+    insertFridgeItems: { _ in return .success(true) },
     insertGroceryItem: { _ in return .success(true) },
     insertRecipe: { _ in return .success(true) },
     insertRecipeItem: { _ in return .success(true) },
@@ -187,6 +188,9 @@ enum DatabaseClientKey: DependencyKey {
       },
       insertFridgeItem: { item in
         return await insertItem(dbClient.insertFridgeItem, item: item)
+      },
+      insertFridgeItems: { items in
+        return await insertItem(dbClient.insertFridgeItems, item: items)
       },
       insertGroceryItem: { item in
         return await insertItem(dbClient.insertGroceryItem, item: item)

@@ -64,7 +64,7 @@ public struct SearchBarListView<Item: Equatable & Identifiable & Nameable>: View
         ForEach(Array(zip(self.filteredItems.indices, self.filteredItems)), id: \.0) { index, item in
           VStack(spacing: 0) {
             Text(item.name)
-              .foregroundColor(.accentColor)
+              .foregroundColor(Color.init("AppetiteRed"))
               .padding(.vertical, 4)
               .frame(maxWidth: .infinity, alignment: .leading)
               .onTapGesture(perform: {

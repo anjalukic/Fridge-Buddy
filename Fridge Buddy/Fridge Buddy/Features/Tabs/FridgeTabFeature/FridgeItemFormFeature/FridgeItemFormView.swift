@@ -64,7 +64,11 @@ public struct FridgeItemFormView: View {
       }
       .onAppear { viewStore.send(.onAppear) }
       .navigationTitle(viewStore.isEditing ? "Editing \(viewStore.fridgeItem.name)" : "Adding new item")
-      .navigationBarItems(trailing: Button("Done", action: { viewStore.send(.didTapDone) }).disabled(!viewStore.isDoneButtonEnabled))
+      .navigationBarItems(trailing:
+        Button("Done", action: { viewStore.send(.didTapDone) })
+          .foregroundColor(.white)
+          .disabled(!viewStore.isDoneButtonEnabled)
+      )
     }
   }
 }

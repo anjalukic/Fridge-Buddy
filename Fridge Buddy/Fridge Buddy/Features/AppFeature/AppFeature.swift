@@ -69,6 +69,9 @@ public struct AppFeature: ReducerProtocol {
     Reduce { state, action in
       switch action {
       case .onAppear:
+        let plannedMealMessageLastShown = UserDefaults.standard.object(forKey: "plannedMealMessageLastShown") as? Date
+        print(plannedMealMessageLastShown)
+        let shouldShowMessage = !(plannedMealMessageLastShown?.isSameDate(as: Date()) ?? false)
         return .merge(
           .run { send in
             await send(.handleRefreshDatabase)
@@ -76,7 +79,7 @@ public struct AppFeature: ReducerProtocol {
               await send(.handleRefreshDatabase)
             }
           },
-          .send(.mealPlannerTabAction(.handleCheckTodaysPlans))
+          shouldShowMessage ? .send(.mealPlannerTabAction(.handleCheckTodaysPlans)) : .none
         )
       case .handleRefreshDatabase:
         return self.refreshDatabase()
@@ -97,6 +100,8 @@ public struct AppFeature: ReducerProtocol {
         case .delegate(let action):
           switch action {
           case .presentPlannedMealAlert(message: let message):
+            guard let message else { return .none }
+            UserDefaults.standard.set(Date(), forKey: "plannedMealMessageLastShown")
             state.alert = .todaysMenu(message: message)
             return .none
           }

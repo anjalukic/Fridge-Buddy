@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 struct AppView: View {
   private let store: StoreOf<AppFeature>
+  @AppStorage("isDarkModeEnabled") var isDarkModeEnabled = false
   
   public init(store: StoreOf<AppFeature>) {
     self.store = store
@@ -29,7 +30,7 @@ struct AppView: View {
             action: AppFeature.Action.fridgeTabAction
           ))
           .navigationTitle(AppFeature.Tab.fridge.title)
-          .navigationBarTitleDisplayMode(.inline)
+          .setupNavBar()
         }
           .tabItem {
             Label(AppFeature.Tab.fridge.title, systemImage: "refrigerator.fill")
@@ -42,7 +43,7 @@ struct AppView: View {
             action: AppFeature.Action.recipesTabAction
           ))
           .navigationTitle(AppFeature.Tab.recipes.title)
-          .navigationBarTitleDisplayMode(.inline)
+          .setupNavBar()
         }
           .tabItem {
             Label(AppFeature.Tab.recipes.title, systemImage: "book")
@@ -55,7 +56,7 @@ struct AppView: View {
             action: AppFeature.Action.shoppingListTabAction
           ))
           .navigationTitle(AppFeature.Tab.shoppingList.title)
-          .navigationBarTitleDisplayMode(.inline)
+          .setupNavBar()
         }
           .tabItem {
             Label(AppFeature.Tab.shoppingList.title, systemImage: "list.bullet.clipboard")
@@ -68,7 +69,7 @@ struct AppView: View {
             action: AppFeature.Action.mealPlannerTabAction
           ))
           .navigationTitle(AppFeature.Tab.mealPlanner.title)
-          .navigationBarTitleDisplayMode(.inline)
+          .setupNavBar()
         }
           .tabItem {
             Label(AppFeature.Tab.mealPlanner.title, systemImage: "calendar")
@@ -81,21 +82,24 @@ struct AppView: View {
             action: AppFeature.Action.profileTabAction
           ))
           .navigationTitle(AppFeature.Tab.profile.title)
-          .navigationBarTitleDisplayMode(.inline)
+          .setupNavBar()
         }
           .tabItem {
             Label(AppFeature.Tab.profile.title, systemImage: "person")
           }
           .tag(AppFeature.Tab.profile)
       }
+      .accentColor(Color.init("AppetiteRed"))
       .onAppear {
         let appearance = UITabBarAppearance()
-        appearance.shadowColor = .white
+        appearance.shadowColor = UIColor(Color.init("AppetiteRed"))
         appearance.shadowImage = UIImage(named: "tab-shadow")?.withRenderingMode(.alwaysTemplate)
         UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().standardAppearance = appearance
         viewStore.send(.onAppear)
       }
       .alert(self.store.scope(state: \.alert?.alertState, action: { .alert($0) }), dismiss: .didDismiss)
+      .preferredColorScheme(self.isDarkModeEnabled ? .dark : .light)
     }
   }
 }

@@ -45,13 +45,10 @@
 		DD99F5402A953BB900F6CBE5 /* ReceiptScanFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F53F2A953BB900F6CBE5 /* ReceiptScanFeature.swift */; };
 		DD99F5432A953BCF00F6CBE5 /* ReceiptScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F5422A953BCF00F6CBE5 /* ReceiptScanView.swift */; };
 		DD99F54F2A969C2800F6CBE5 /* JSONImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F54E2A969C2800F6CBE5 /* JSONImporter.swift */; };
-		DD99F5522A979C1200F6CBE5 /* AddItemsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F5512A979C1200F6CBE5 /* AddItemsFeature.swift */; };
-		DD99F5542A979C2000F6CBE5 /* AddItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F5532A979C2000F6CBE5 /* AddItemsView.swift */; };
-		DD99F5572A979D6F00F6CBE5 /* AddingItemsListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F5562A979D6F00F6CBE5 /* AddingItemsListFeature.swift */; };
-		DD99F5592A979D7700F6CBE5 /* AddingItemsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F5582A979D7700F6CBE5 /* AddingItemsListView.swift */; };
 		DD99F55B2A97F53E00F6CBE5 /* groceryItems.json in Resources */ = {isa = PBXBuildFile; fileRef = DD99F55A2A97F53E00F6CBE5 /* groceryItems.json */; };
 		DD99F55D2A97F5EB00F6CBE5 /* groceryItemsSr.json in Resources */ = {isa = PBXBuildFile; fileRef = DD99F55C2A97F5EB00F6CBE5 /* groceryItemsSr.json */; };
 		DD99F55F2A992C6100F6CBE5 /* ImageSaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F55E2A992C6100F6CBE5 /* ImageSaverView.swift */; };
+		DD99F5652A9E831C00F6CBE5 /* View+OrangeNavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD99F5642A9E831C00F6CBE5 /* View+OrangeNavBar.swift */; };
 		DDA8E1A22A1CBA8A004F7D9E /* Fridge_BuddyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1A12A1CBA8A004F7D9E /* Fridge_BuddyApp.swift */; };
 		DDA8E1A42A1CBA8A004F7D9E /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDA8E1A32A1CBA8A004F7D9E /* AppView.swift */; };
 		DDA8E1A62A1CBA8B004F7D9E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DDA8E1A52A1CBA8B004F7D9E /* Assets.xcassets */; };
@@ -123,13 +120,10 @@
 		DD99F53F2A953BB900F6CBE5 /* ReceiptScanFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptScanFeature.swift; sourceTree = "<group>"; };
 		DD99F5422A953BCF00F6CBE5 /* ReceiptScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptScanView.swift; sourceTree = "<group>"; };
 		DD99F54E2A969C2800F6CBE5 /* JSONImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONImporter.swift; sourceTree = "<group>"; };
-		DD99F5512A979C1200F6CBE5 /* AddItemsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemsFeature.swift; sourceTree = "<group>"; };
-		DD99F5532A979C2000F6CBE5 /* AddItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddItemsView.swift; sourceTree = "<group>"; };
-		DD99F5562A979D6F00F6CBE5 /* AddingItemsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingItemsListFeature.swift; sourceTree = "<group>"; };
-		DD99F5582A979D7700F6CBE5 /* AddingItemsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingItemsListView.swift; sourceTree = "<group>"; };
 		DD99F55A2A97F53E00F6CBE5 /* groceryItems.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = groceryItems.json; path = "Fridge Buddy/Resources/groceryItems.json"; sourceTree = "<group>"; };
 		DD99F55C2A97F5EB00F6CBE5 /* groceryItemsSr.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = groceryItemsSr.json; path = "Fridge Buddy/Resources/groceryItemsSr.json"; sourceTree = "<group>"; };
 		DD99F55E2A992C6100F6CBE5 /* ImageSaverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSaverView.swift; sourceTree = "<group>"; };
+		DD99F5642A9E831C00F6CBE5 /* View+OrangeNavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+OrangeNavBar.swift"; sourceTree = "<group>"; };
 		DDA8E19E2A1CBA8A004F7D9E /* Fridge Buddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fridge Buddy.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDA8E1A12A1CBA8A004F7D9E /* Fridge_BuddyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fridge_BuddyApp.swift; sourceTree = "<group>"; };
 		DDA8E1A32A1CBA8A004F7D9E /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
@@ -277,24 +271,6 @@
 			path = ReceiptScanFeature;
 			sourceTree = "<group>";
 		};
-		DD99F5502A979BFC00F6CBE5 /* AddItemsFeature */ = {
-			isa = PBXGroup;
-			children = (
-				DD99F5532A979C2000F6CBE5 /* AddItemsView.swift */,
-				DD99F5512A979C1200F6CBE5 /* AddItemsFeature.swift */,
-			);
-			path = AddItemsFeature;
-			sourceTree = "<group>";
-		};
-		DD99F5552A979D5900F6CBE5 /* AddingItemsListFeature */ = {
-			isa = PBXGroup;
-			children = (
-				DD99F5562A979D6F00F6CBE5 /* AddingItemsListFeature.swift */,
-				DD99F5582A979D7700F6CBE5 /* AddingItemsListView.swift */,
-			);
-			path = AddingItemsListFeature;
-			sourceTree = "<group>";
-		};
 		DDA8E1952A1CBA8A004F7D9E = {
 			isa = PBXGroup;
 			children = (
@@ -348,8 +324,6 @@
 		DDA8E1B52A1CD026004F7D9E /* FridgeTabFeature */ = {
 			isa = PBXGroup;
 			children = (
-				DD99F5552A979D5900F6CBE5 /* AddingItemsListFeature */,
-				DD99F5502A979BFC00F6CBE5 /* AddItemsFeature */,
 				DD99F5412A953BBF00F6CBE5 /* ReceiptScanFeature */,
 				DDA8E1D42A1F5BCA004F7D9E /* FridgeItemFormFeature */,
 				DDA8E1CE2A1E18FC004F7D9E /* ItemView.swift */,
@@ -422,6 +396,7 @@
 				DD99F53D2A953B1B00F6CBE5 /* QRScannerView.swift */,
 				DD99F54E2A969C2800F6CBE5 /* JSONImporter.swift */,
 				DD99F55E2A992C6100F6CBE5 /* ImageSaverView.swift */,
+				DD99F5642A9E831C00F6CBE5 /* View+OrangeNavBar.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -565,13 +540,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DDFA8A562A29F4340066B8BB /* Dependencies+databaseClient.swift in Sources */,
+				DD99F5652A9E831C00F6CBE5 /* View+OrangeNavBar.swift in Sources */,
 				DD4BC0832A88E32800C33C4E /* DBClient+RecipeItem.swift in Sources */,
 				DD4BC06E2A8526F600C33C4E /* DatabaseClient.swift in Sources */,
 				DDA8E1DD2A1F6381004F7D9E /* SearchBarListView.swift in Sources */,
 				DDA8E1A42A1CBA8A004F7D9E /* AppView.swift in Sources */,
 				DDA8E1C72A1E0FB6004F7D9E /* DBClient+GroceryItem.swift in Sources */,
 				DD560B952A922983009FA067 /* ShareFridgeView.swift in Sources */,
-				DD99F5572A979D6F00F6CBE5 /* AddingItemsListFeature.swift in Sources */,
 				DD560B7F2A90D9FE009FA067 /* ProfileTabView.swift in Sources */,
 				DDA8E1C32A1E0D88004F7D9E /* FridgeItem.swift in Sources */,
 				DD4BC0872A88F44E00C33C4E /* SearchBarView.swift in Sources */,
@@ -580,7 +555,6 @@
 				DD560B8C2A921429009FA067 /* UserInfoClient.swift in Sources */,
 				DDA8E1C12A1DF9A5004F7D9E /* GroceryType.swift in Sources */,
 				DD560B7A2A8E8482009FA067 /* RecipesListView.swift in Sources */,
-				DD99F5542A979C2000F6CBE5 /* AddItemsView.swift in Sources */,
 				DDCED3E82A8BCE77002397C8 /* DBClient+ShoppingListItem.swift in Sources */,
 				DD4BC0722A85441200C33C4E /* FridgeItemFormView.swift in Sources */,
 				DD99F53C2A9531EF00F6CBE5 /* Semaphore.swift in Sources */,
@@ -599,7 +573,6 @@
 				DD560B902A921D92009FA067 /* ServerRequest.swift in Sources */,
 				DDA8E1CF2A1E18FC004F7D9E /* ItemView.swift in Sources */,
 				DDCED3DA2A892965002397C8 /* InteractiveCookingView.swift in Sources */,
-				DD99F5592A979D7700F6CBE5 /* AddingItemsListView.swift in Sources */,
 				DDA8E1B92A1CD086004F7D9E /* FridgeTabView.swift in Sources */,
 				DDA8E1B42A1CC249004F7D9E /* AppFeature.swift in Sources */,
 				DDCED3D82A89295C002397C8 /* InteractiveCookingFeature.swift in Sources */,
@@ -629,7 +602,6 @@
 				DDCED3ED2A8BD144002397C8 /* ShoppingListTabView.swift in Sources */,
 				DDCED3F22A8BD49D002397C8 /* ShoppingListItemFormView.swift in Sources */,
 				DDCED3EB2A8BD135002397C8 /* ShoppingListTabFeature.swift in Sources */,
-				DD99F5522A979C1200F6CBE5 /* AddItemsFeature.swift in Sources */,
 				DD4BC07D2A88DA9100C33C4E /* RecipeItem.swift in Sources */,
 				DDA8E1BE2A1D0E2C004F7D9E /* GroceryItem.swift in Sources */,
 				DD4BC07F2A88DD0000C33C4E /* RecipeStep.swift in Sources */,

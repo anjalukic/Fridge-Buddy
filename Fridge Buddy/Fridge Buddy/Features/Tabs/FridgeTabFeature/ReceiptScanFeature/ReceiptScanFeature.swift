@@ -35,11 +35,12 @@ public struct ReceiptScanFeature: ReducerProtocol {
     public enum DependencyAction: Equatable {
       case handleItemsFetched(Result<IdentifiedArrayOf<GroceryItem>, DBClient.DBError>)
       case handleParsedFridgeItems(IdentifiedArrayOf<FridgeItem>)
+      case handleInsertingResult(Result<Bool, DBClient.DBError>)
     }
   }
   
-  @Dependency(\.dismiss) var dismiss
   @Dependency(\.databaseClient) var dbClient
+  @Dependency(\.dismiss) var dismiss
   
   public var body: some ReducerProtocolOf<Self> {
     Reduce { state, action in
@@ -62,7 +63,10 @@ public struct ReceiptScanFeature: ReducerProtocol {
         return .none
         
       case .didTapDone:
-        return .send(.delegate(.didTapDone(state.fridgeItems.elements)))
+        return .run { [items = state.fridgeItems] send in
+          let result = await self.dbClient.insertFridgeItems(items.elements)
+          await send(.dependency(.handleInsertingResult(result)))
+        }
         
       case .didEditItemName(let newName, let id):
         guard
@@ -113,6 +117,17 @@ public struct ReceiptScanFeature: ReducerProtocol {
       case .dependency(.handleParsedFridgeItems(let items)):
         state.fridgeItems = items
         return .none
+        
+      case .dependency(.handleInsertingResult(let result)):
+        switch result {
+        case .success:
+          return .merge(
+            .run { _ in await self.dismiss(animation: .default) },
+            .send(.delegate(.didTapDone(state.fridgeItems.elements)))
+          )
+        case .failure(let error):
+          return .none
+        }
         
       case .delegate:
         // handled in the higher level reducer

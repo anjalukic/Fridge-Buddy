@@ -42,7 +42,7 @@ public struct FridgeItemFormFeature: ReducerProtocol {
     public enum DependencyAction: Equatable {
       case handleFetchingResult(Result<IdentifiedArrayOf<GroceryItem>, DBClient.DBError>)
       case handleUpdatingResult(Result<Bool, DBClient.DBError>)
-      case handleAddingGroceryItemResult(Result<Bool, DBClient.DBError>)
+      case handleInsertingResult(Result<Bool, DBClient.DBError>)
     }
   }
   
@@ -78,12 +78,20 @@ public struct FridgeItemFormFeature: ReducerProtocol {
               defaultExpirationInterval: state.fridgeItem.expirationDate.timeIntervalSinceReferenceDate - Date().timeIntervalSinceReferenceDate,
               type: groceryType
             )
-            return .run { send in
-              let result = await self.dbClient.insertGroceryItem(newGroceryItem)
-              await send(.dependency(.handleAddingGroceryItemResult(result)))
+            return .run { [fridgeItem = state.fridgeItem] send in
+              let groceryResult = await self.dbClient.insertGroceryItem(newGroceryItem)
+              guard case .success = groceryResult else {
+                await send(.dependency(.handleInsertingResult(.failure(.insertionError))))
+                return
+              }
+              let fridgeResult = await self.dbClient.insertFridgeItem(fridgeItem)
+              await send(.dependency(.handleInsertingResult(fridgeResult)))
             }
           } else {
-            return .send(.delegate(.didTapDone(state.fridgeItem)))
+            return .run { [fridgeItem = state.fridgeItem] send in
+              let fridgeResult = await self.dbClient.insertFridgeItem(fridgeItem)
+              await send(.dependency(.handleInsertingResult(fridgeResult)))
+            }
           }
         }
         
@@ -148,7 +156,7 @@ extension FridgeItemFormFeature {
       case .failure:
         return .none
       }
-    case .handleAddingGroceryItemResult(let result):
+    case .handleInsertingResult(let result):
       switch result {
       case .success:
         return .merge(

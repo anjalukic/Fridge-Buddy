@@ -30,7 +30,11 @@ struct ReceiptScanView: View {
       .navigationDestination(isPresented: .init(get: { viewStore.isScanningComplete }, set: { _ in })) {
         self.items
           .navigationTitle("Scanned items")
-          .navigationBarItems(trailing: Button("Done", action: { viewStore.send(.didTapDone) }).disabled(!viewStore.state.isDoneEnabled))
+          .navigationBarItems(trailing:
+            Button("Done", action: { viewStore.send(.didTapDone) })
+              .disabled(!viewStore.state.isDoneEnabled)
+              .foregroundColor(.white)
+          )
       }
       .onAppear { viewStore.send(.onAppear) }
     }

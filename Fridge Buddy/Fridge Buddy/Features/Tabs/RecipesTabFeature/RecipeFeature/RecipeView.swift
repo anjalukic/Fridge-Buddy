@@ -113,21 +113,25 @@ public struct RecipeView: View {
         if viewStore.hasMissingIngredients {
           Button { viewStore.send(.didTapAddMissingIngredientsToShoppingList) } label: {
             Text("Add missing ingredients to shopping list")
+              .padding(.vertical, 8)
               .frame(maxWidth: .infinity)
           }
         }
         Button { viewStore.send(.didTapPrepareAndAddToFridge) } label: {
           Text("Mark as prepared")
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
         }
         if !viewStore.recipeSteps.isEmpty {
           Button { viewStore.send(.didTapStartCooking)} label: {
             Text("Start cooking")
+              .padding(.vertical, 8)
               .frame(maxWidth: .infinity)
           }
         }
       }
       .buttonStyle(.borderedProminent)
+      .accentColor(Color.init("AppetiteRed"))
       .padding(.horizontal, self.horizontalPadding)
     }
   }

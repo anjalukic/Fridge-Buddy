@@ -50,7 +50,7 @@ public struct RecipeFormView: View {
         }
       }
       .navigationTitle(viewStore.isEditing ? "Editing \(viewStore.recipe.name)" : "Adding new recipe")
-      .navigationBarItems(trailing: Button("Done", action: { viewStore.send(.didTapDone) }))
+      .navigationBarItems(trailing: Button("Done", action: { viewStore.send(.didTapDone) }).foregroundColor(.white))
     }
   }
   

@@ -130,4 +130,37 @@ extension DBClient {
       throw DBError.statementPreparationError
     }
   }
+  
+  func insertFridgeItems(_ fridgeItems: [FridgeItem]) throws {
+    let existingFridgeItems = try self.readFridgeItem()
+    let newIds = fridgeItems.map { $0.id }
+    try existingFridgeItems.forEach { if newIds.contains($0.id) { throw DBError.duplicateIdInsertError } }
+    var insertStatementString =
+    "INSERT INTO FridgeItem (id, groceryItemId, expDate, amount, unit) VALUES "
+    var values = Array.init(repeating: "(?, ?, DATETIME(?), ?, ?)", count: fridgeItems.count).joined(separator: ", ")
+    values.append(";")
+    insertStatementString.append(values)
+    var insertStatement: OpaquePointer? = nil
+    defer { sqlite3_finalize(insertStatement) }
+    
+    if sqlite3_prepare_v2(self.db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
+      
+      for (i, item) in fridgeItems.enumerated() {
+        sqlite3_bind_text(insertStatement, Int32(i * 5 + 1), item.id.uuidString.utf8, -1, nil)
+        sqlite3_bind_text(insertStatement, Int32(i * 5 + 2), item.groceryItemId.uuidString.utf8, -1, nil)
+        sqlite3_bind_text(insertStatement, Int32(i * 5 + 3), item.expirationDate.toString().utf8, -1, nil)
+        sqlite3_bind_double(insertStatement, Int32(i * 5 + 4), item.amount)
+        sqlite3_bind_text(insertStatement, Int32(i * 5 + 5), item.unit.utf8, -1, nil)
+      }
+      print(insertStatementString)
+      let result = sqlite3_step(insertStatement)
+      if result == SQLITE_DONE {
+        print("Successfully inserted \(fridgeItems.count) rows to FridgeItem.")
+      } else {
+        throw DBError.insertionError
+      }
+    } else {
+      throw DBError.statementPreparationError
+    }
+  }
 }

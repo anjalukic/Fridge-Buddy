@@ -19,8 +19,8 @@ public struct LoginView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       VStack {
         Text(viewStore.isLoggingIn ? "Log in" : "Register")
-          .fontWeight(.bold)
-          .padding(16)
+          .font(.system(size: 32, weight: .bold))
+          .padding(.vertical, 32)
         self.form
         Spacer()
         self.continueButton
@@ -32,7 +32,7 @@ public struct LoginView: View {
   
   private var form: some View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
-      VStack {
+      VStack(spacing: 20) {
         HStack {
           Text("Username: ")
           TextField("username", text: viewStore.binding(get: { $0.username }, send: { .didChangeUsername($0) }))
@@ -62,7 +62,7 @@ public struct LoginView: View {
           }
         }
       }
-      .padding(.vertical, 16)
+      .padding(16)
     }
   }
   
@@ -70,11 +70,12 @@ public struct LoginView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       Button { viewStore.send(.didTapContinue) } label: {
         Text(viewStore.isLoggingIn ? "Log in" : "Register")
-          .fontWeight(.bold)
+          .padding(.vertical, 8)
           .frame(maxWidth: .infinity)
       }
       .disabled(!viewStore.isContinueEnabled)
       .buttonStyle(.borderedProminent)
+      .accentColor(Color.init("AppetiteRed"))
     }
   }
 }

@@ -52,10 +52,7 @@ public struct ProfileTabFeature: ReducerProtocol {
       switch action {
       case .onAppear:
         state.user = self.userInfoClient.getUserInfo()
-        return .run { send in
-          let result = await self.sharingClient.getConnectedEmails()
-          await send(.dependency(.handleFetchingConnectedEmails(result)))
-        }
+        return self.fetchConnectedEmails(state: &state)
         
       case .didTapLogIn:
         state.loginScreen = .init(mode: .login)
@@ -64,6 +61,7 @@ public struct ProfileTabFeature: ReducerProtocol {
       case .didTapLogOut:
         self.userInfoClient.logoutUser()
         state.user = self.userInfoClient.getUserInfo()
+        state.connectedEmails = []
         return .none
         
       case .didTapRegister:
@@ -156,7 +154,7 @@ extension ProfileTabFeature {
     switch action {
     case .dismiss:
       state.user = self.userInfoClient.getUserInfo()
-      return .none
+      return self.fetchConnectedEmails(state: &state)
       
     case .presented:
       return .none
@@ -166,13 +164,17 @@ extension ProfileTabFeature {
   private func handleShareFridgeAction(_ action: PresentationAction<ShareFridgeFeature.Action>, state: inout State) -> EffectTask<Action> {
     switch action {
     case .dismiss:
-      return .run { send in
-        let result = await self.sharingClient.getConnectedEmails()
-        await send(.dependency(.handleFetchingConnectedEmails(result)))
-      }
+      return self.fetchConnectedEmails(state: &state)
       
     case .presented:
       return .none
+    }
+  }
+  
+  private func fetchConnectedEmails(state: inout State) -> EffectTask<Action> {
+    return .run { send in
+      let result = await self.sharingClient.getConnectedEmails()
+      await send(.dependency(.handleFetchingConnectedEmails(result)))
     }
   }
 }

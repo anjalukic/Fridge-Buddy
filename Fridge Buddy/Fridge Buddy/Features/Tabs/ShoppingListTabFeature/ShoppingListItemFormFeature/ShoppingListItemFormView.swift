@@ -48,7 +48,11 @@ public struct ShoppingListItemFormView: View {
         }
       }
       .navigationTitle(viewStore.isEditing ? "Editing \(viewStore.shoppingListItem.name)" : "Adding new item")
-      .navigationBarItems(trailing: Button("Done", action: { viewStore.send(.didTapDone) }).disabled(!viewStore.isDoneButtonEnabled))
+      .navigationBarItems(trailing:
+        Button("Done", action: { viewStore.send(.didTapDone) })
+        .disabled(!viewStore.isDoneButtonEnabled)
+        .foregroundColor(.white)
+      )
     }
   }
 }

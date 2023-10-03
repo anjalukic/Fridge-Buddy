@@ -24,7 +24,7 @@ public struct TitleWithBackButtonView: View {
       }, label: {
         Image(systemName: "chevron.backward")
           .renderingMode(.template)
-          .foregroundColor(.black)
+          .foregroundColor(Color.init("AppetiteRed"))
       })
       
       Spacer()

@@ -33,13 +33,13 @@ public struct MealPlannerTabView: View {
   
   private var calendar: some View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
-      VStack(spacing: 8) {
+      VStack(spacing: 16) {
         DatePicker(
           selection: viewStore.binding(get: { $0.selectedDate }, send: { .didChangeSelectedDate($0) }),
           in: Date()...Date() + TimeInterval(fromDays: 13),
           displayedComponents: [.date]
         ) {}
-          .datePickerStyle(.compact)
+          .datePickerStyle(.graphical)
           .clipped()
           .labelsHidden()
           .padding(.vertical, 16)
@@ -47,6 +47,8 @@ public struct MealPlannerTabView: View {
         ForEach(PlannedMeal.Meal.allCases) { mealType in
           HStack(spacing: 6) {
             Text("\(mealType.title):")
+              .font(.system(size: 20, weight: .semibold))
+            Spacer().frame(width: 8)
             if let meal = viewStore.state.mealForSelectedDate(mealType: mealType) {
               HStack {
                 Button { viewStore.send(.didTapChangeMeal(mealType)) } label: {
@@ -61,12 +63,11 @@ public struct MealPlannerTabView: View {
             } else {
               Button { viewStore.send(.didTapAddNewMeal(mealType)) } label: {
                 Image(systemName: "plus")
+                  .padding(.horizontal, 6)
               }
             }
-            Spacer()
           }
         }
-        
         Spacer()
       }
       .buttonStyle(.bordered)

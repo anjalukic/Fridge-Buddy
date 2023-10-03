@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 public struct ProfileTabView: View {
   private let store: StoreOf<ProfileTabFeature>
+  @AppStorage("isDarkModeEnabled") var isDarkModeEnabled = false
 
   public init(store: StoreOf<ProfileTabFeature>) {
     self.store = store
@@ -43,15 +44,30 @@ public struct ProfileTabView: View {
   private var userInfo: some View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       Group {
-        VStack(spacing: 4) {
+        VStack(spacing: 8) {
           HStack {
             Image(systemName: "person.fill")
-            Text(viewStore.isLoggedIn ? "Logged in as \(viewStore.username!)" : "You are not logged in")
-              .fontWeight(.bold)
+              .resizable()
+              .frame(width: 26, height: 26)
+            Group {
+              if viewStore.isLoggedIn {
+                HStack(spacing: 0) {
+                  Text("Logged in as ")
+                  Text(viewStore.username!)
+                    .foregroundColor(Color.init("AppetiteRed"))
+                }
+              } else {
+                Text("You are not logged in")
+              }
+            }
+              .font(.system(size: 26, weight: .semibold))
               .frame(maxWidth: .infinity, alignment: .leading)
           }
-          Text(viewStore.email ?? "")
-            .frame(maxWidth: .infinity, alignment: .leading)
+          if viewStore.email != nil {
+            Text(viewStore.email ?? "")
+              .fontWeight(.light)
+              .frame(maxWidth: .infinity, alignment: .leading)
+          }
           
           if !viewStore.connectedEmails.isEmpty {
             Text("Fridge sharing with: \(viewStore.connectedEmails.joined(separator: ", "))")
@@ -64,14 +80,14 @@ public struct ProfileTabView: View {
       .padding(.vertical, 16)
       .overlay(
           RoundedRectangle(cornerRadius: 16)
-              .stroke(Color.accentColor, lineWidth: 2)
+              .stroke(Color.init("AppetiteRed"), lineWidth: 2)
       )
     }
   }
   
   private var CTAs: some View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
-      VStack(spacing: 6) {
+      VStack(spacing: 10) {
         if viewStore.isLoggedIn {
           Button { viewStore.send(.didTapLogOut) } label: {
             Text("Log out")
@@ -96,7 +112,7 @@ public struct ProfileTabView: View {
         Divider()
         if viewStore.isLoggedIn {
           Button { viewStore.send(.didTapConnectFridge) } label: {
-            Text(viewStore.connectedEmails.isEmpty ? "Connect your fridge with roommates" : "Connect with another roomate")
+            Text(viewStore.connectedEmails.isEmpty ? "Connect your fridge with roommates" : "Connect with another roommate")
               .frame(maxWidth: .infinity, alignment: .leading)
           }
           Divider()
@@ -108,6 +124,7 @@ public struct ProfileTabView: View {
             Divider()
           }
         }
+        Toggle("Dark mode", isOn: self.$isDarkModeEnabled)
       }
       .buttonStyle(.borderless)
       .padding(.vertical, 16)

@@ -50,6 +50,7 @@ public struct RecipesTabView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       VStack {
         SearchBar(text: $searchText)
+          .padding(.vertical, 6)
         List {
           ForEach(viewStore.sections) { section in
             Section(section) {
@@ -90,6 +91,7 @@ public struct RecipesTabView: View {
         Image(systemName: "plus")
       }
       .opacity(viewStore.isEditing ? 0 : 1)
+      .foregroundColor(.white)
     }
   }
 
@@ -105,6 +107,7 @@ public struct RecipesTabView: View {
         }
       }
     }
+    .foregroundColor(.white)
   }
 }
 

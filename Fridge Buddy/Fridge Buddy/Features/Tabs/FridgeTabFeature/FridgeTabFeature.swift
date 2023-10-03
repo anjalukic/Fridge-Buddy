@@ -16,7 +16,8 @@ public struct FridgeTabFeature: ReducerProtocol {
     var alert: Alert?
     
     @PresentationState var editItem: FridgeItemFormFeature.State?
-    @PresentationState var addItems: AddingItemsListFeature.State?
+    @PresentationState var addItem: FridgeItemFormFeature.State?
+    @PresentationState var scanItems: ReceiptScanFeature.State?
   }
   
   public enum Action: Equatable {
@@ -24,13 +25,15 @@ public struct FridgeTabFeature: ReducerProtocol {
     case didTapEdit
     case didTapDoneEditing
     case didTapAddNewItem
+    case didTapScanItems
     case didTapItem(UUID)
     case didTapDeleteItem(UUID)
     case didTapEditItem(UUID)
     case alert(AlertAction)
     case dependency(DependencyAction)
     case editItem(PresentationAction<FridgeItemFormFeature.Action>)
-    case addItems(PresentationAction<AddingItemsListFeature.Action>)
+    case addItem(PresentationAction<FridgeItemFormFeature.Action>)
+    case scanItems(PresentationAction<ReceiptScanFeature.Action>)
     
     public enum AlertAction: Equatable {
       case didTapConfirmDeletion
@@ -61,7 +64,20 @@ public struct FridgeTabFeature: ReducerProtocol {
         return .none
         
       case .didTapAddNewItem:
-        state.addItems = .init()
+        state.addItem = .init(
+          fridgeItem: .init(
+            id: .init(),
+            groceryItem: GroceryItem.apple,
+            expirationDate: Date() + GroceryItem.apple.defaultExpirationInterval,
+            amount: 1,
+            unit: Unit.pcs
+          ),
+          mode: .addingNewItem
+        )
+        return .none
+        
+      case .didTapScanItems:
+        state.scanItems = .init()
         return .none
 
       case .didTapItem(let id), .didTapEditItem(let id):
@@ -85,16 +101,23 @@ public struct FridgeTabFeature: ReducerProtocol {
         guard case .presented(let editAction) = action else { return .none }
         return self.handleEditItemAction(editAction, state: &state)
         
-      case .addItems(let action):
+      case .addItem(let action):
         guard case .presented(let addAction) = action else { return .none }
-        return self.handleAddItemsAction(addAction, state: &state)
+        return self.handleAddItemAction(addAction, state: &state)
+        
+      case .scanItems(let action):
+        guard case .presented(let scanAction) = action else { return .none }
+        return self.handleScanItemsAction(scanAction, state: &state)
       }
     }
     .ifLet(\.$editItem, action: /Action.editItem) {
       FridgeItemFormFeature()
     }
-    .ifLet(\.$addItems, action: /Action.addItems) {
-      AddingItemsListFeature()
+    .ifLet(\.$addItem, action: /Action.addItem) {
+      FridgeItemFormFeature()
+    }
+    .ifLet(\.$scanItems, action: /Action.scanItems) {
+      ReceiptScanFeature()
     }
   }
 }
@@ -131,11 +154,24 @@ extension FridgeTabFeature {
     }
   }
   
-  private func handleAddItemsAction(_ action: AddingItemsListFeature.Action, state: inout State) -> EffectTask<Action> {
+  private func handleAddItemAction(_ action: FridgeItemFormFeature.Action, state: inout State) -> EffectTask<Action> {
     switch action {
     case .delegate(let action):
       switch action {
-      case .didAddItems:
+      case .didTapDone:
+        return self.fetchItems()
+      }
+      
+    default:
+      return .none
+    }
+  }
+  
+  private func handleScanItemsAction(_ action: ReceiptScanFeature.Action, state: inout State) -> EffectTask<Action> {
+    switch action {
+    case .delegate(let action):
+      switch action {
+      case .didTapDone:
         return self.fetchItems()
       }
       

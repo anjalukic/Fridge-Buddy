@@ -29,6 +29,7 @@ public struct DatabaseClient {
   public var updateRecipe: (Recipe) async -> Result<Bool, DBClient.DBError>
   public var updateShoppingListItem: (ShoppingListItem) async -> Result<Bool, DBClient.DBError>
   public var insertFridgeItem: (FridgeItem) async -> Result<Bool, DBClient.DBError>
+  public var insertFridgeItems: ([FridgeItem]) async -> Result<Bool, DBClient.DBError>
   public var insertGroceryItem: (GroceryItem) async -> Result<Bool, DBClient.DBError>
   public var insertRecipe: (Recipe) async -> Result<Bool, DBClient.DBError>
   public var insertRecipeItem: (RecipeItem) async -> Result<Bool, DBClient.DBError>

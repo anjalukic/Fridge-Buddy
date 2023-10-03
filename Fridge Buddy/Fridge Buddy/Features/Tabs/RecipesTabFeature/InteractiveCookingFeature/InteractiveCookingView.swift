@@ -74,6 +74,7 @@ public struct InteractiveCookingView: View {
         }
       }
       .buttonStyle(.borderedProminent)
+      .accentColor(Color.init("AppetiteRed"))
     }
   }
 }

@@ -45,11 +45,11 @@ public struct MealPlannerTabFeature: ReducerProtocol {
       case handleDeletionResult(Result<Bool, DBClient.DBError>)
       case handleEditingResult(Result<Bool, DBClient.DBError>)
       case handleAddingResult(Result<Bool, DBClient.DBError>)
-      case handleTodaysMealsFetched(Result<String, DBClient.DBError>)
+      case handleTodaysMealsFetched(Result<String?, DBClient.DBError>)
     }
     
     public enum DelegateAction: Equatable {
-      case presentPlannedMealAlert(message: String)
+      case presentPlannedMealAlert(message: String?)
     }
   }
   
@@ -75,6 +75,10 @@ public struct MealPlannerTabFeature: ReducerProtocol {
             return
           }
           let todaysMeals = meals.filter { $0.date.isSameDate(as: Date()) }
+          guard !todaysMeals.isEmpty else {
+            await send(.dependency(.handleTodaysMealsFetched(.success(nil))))
+            return
+          }
           let todaysRecipeIds = todaysMeals.map { $0.recipeId }
           var startingFridgeItems = fridgeItems
           var missingItems: IdentifiedArrayOf<RecipeItem> = []

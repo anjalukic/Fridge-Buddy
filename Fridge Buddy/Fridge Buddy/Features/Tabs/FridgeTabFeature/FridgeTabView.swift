@@ -19,7 +19,7 @@ public struct FridgeTabView: View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
       self.fridgeContents
         .navigationBarItems(
-          leading: self.leadingButton,
+          leading: self.leadingButtons,
           trailing: self.trailingButton
         )
         .animation(.default, value: viewStore.isEditing)
@@ -31,9 +31,14 @@ public struct FridgeTabView: View {
           FridgeItemFormView(store: store)
         }
         .navigationDestination(
-          store: self.store.scope(state: \.$addItems, action: { .addItems($0) })
+          store: self.store.scope(state: \.$addItem, action: { .addItem($0) })
         ) { store in
-          AddingItemsListView(store: store)
+          FridgeItemFormView(store: store)
+        }
+        .navigationDestination(
+          store: self.store.scope(state: \.$scanItems, action: { .scanItems($0) })
+        ) { store in
+          ReceiptScanView(store: store)
         }
         .onAppear {
           viewStore.send(.onAppear)
@@ -56,7 +61,7 @@ public struct FridgeTabView: View {
                       ItemView(name: item.name, amount: item.amount, unitName: item.unit)
                       if item.expirationDate.hasPassed {
                         Image(systemName: "calendar.badge.exclamationmark")
-                          .foregroundColor(.orange)
+                          .foregroundColor(Color.init("AppetiteRed"))
                       }
                     }
                   })
@@ -81,12 +86,18 @@ public struct FridgeTabView: View {
     }
   }
   
-  private var leadingButton: some View {
+  private var leadingButtons: some View {
     WithViewStore(self.store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.didTapAddNewItem) }) {
-        Image(systemName: "plus")
+      HStack {
+        Button(action: { viewStore.send(.didTapAddNewItem) }) {
+          Image(systemName: "plus")
+        }
+        Button(action: { viewStore.send(.didTapScanItems) }) {
+          Image(systemName: "qrcode")
+        }
       }
-      .opacity(viewStore.isEditing ? 0 : 1)
+        .opacity(viewStore.isEditing ? 0 : 1)
+        .foregroundColor(.white)
     }
   }
   
@@ -102,6 +113,7 @@ public struct FridgeTabView: View {
         }
       }
     }
+    .foregroundColor(.white)
   }
 }
 
